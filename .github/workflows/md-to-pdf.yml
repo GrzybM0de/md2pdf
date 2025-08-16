@@ -1,0 +1,37 @@
+name: md-to-pdf
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.md'
+      - 'md2pdf.config.js'
+      - 'styles.css'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Create output folder
+        run: mkdir -p dist
+
+      - name: Generate PDF
+        run: |
+          npx --yes md-to-pdf@latest *.md \
+            --config-file md2pdf.config.js \
+            --out-dir dist/
+
+      - name: Upload PDFs
+        uses: actions/upload-artifact@v4
+        with:
+          name: keto-pdfs
+          path: dist/
